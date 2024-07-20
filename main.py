@@ -1,41 +1,34 @@
-store_products = ["car", "shirt", "skirt", "laptop", "suit"]
+import socket
+import sys
 
-def add_product(store_products_add):
-    request = input("Type a product that you wish to add to the list: ").lower()
-    
-    store_products_add.append(request)
-    print(f"New product added: {request}")
+def portScanning(remote_host):
+    try:
+        for port in range(1, 254 + 1):
+            tcp_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            tcp_socket.settimeout(1)  # Define um timeout para evitar bloqueios
+            data = tcp_socket.connect_ex((remote_host, port))
+            if data == 0:
+                try:
+                    service = socket.getservbyport(port)
+                except OSError:
+                    service = "Unknown service"
+                print(f"[+] Open {port}:::{service}")
+            tcp_socket.close()  # Fecha o socket após a conexão
+    except socket.gaierror:
+        print("[-] Host remoto não encontrado [-]")
+        exit()
+    except socket.error:
+        print("[-] Erro durante o socket [-]")
+    return
 
-def remove_products(store_products_rm):
-    request = input("Type a product you wish to remove: ").lower()
-    
-    if request in store_products_rm:
-        store_products_rm.remove(request)
+def main():
+    if len(sys.argv) != 2:
+        print("Uso: python portscanning.py [host]")
+    elif sys.argv[1] == "-h":
+        print("python portscanning.py [host]")
     else:
-        print(f"Product {request} not found in the list")
+        remote_host = sys.argv[1]
+        portScanning(remote_host)
         
-    print(f"Product removed! Updated list: {store_products_rm}")
-
-def listing_products(store_products_listing):
-    for product in store_products_listing:
-        print(f"Product: {product}")
-
-while True:
-    option = input("Which option do you wish?\n(1) Add product\n(2) Remove product\n(3) List products\nPress 0 to exit: ")
-    print('')
-    print('')
-    
-    if option == "1":
-        add_product(store_products)
-    
-    elif option == "2":
-        remove_products(store_products)
-        
-    elif option == "3":
-        listing_products(store_products)
-    
-    elif option == "0":
-        print("You left the page")
-        break
-    else:
-        print("Invalid option")
+if __name__ == "__main__":
+    main()
