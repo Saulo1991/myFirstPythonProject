@@ -1,34 +1,33 @@
-import socket
-import sys
+def add_task(tasks, task):
+    tasks.append(task)
 
-def portScanning(remote_host):
-    try:
-        for port in range(1, 254 + 1):
-            tcp_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            tcp_socket.settimeout(1)  # Define um timeout para evitar bloqueios
-            data = tcp_socket.connect_ex((remote_host, port))
-            if data == 0:
-                try:
-                    service = socket.getservbyport(port)
-                except OSError:
-                    service = "Unknown service"
-                print(f"[+] Open {port}:::{service}")
-            tcp_socket.close()  # Fecha o socket após a conexão
-    except socket.gaierror:
-        print("[-] Host remoto não encontrado [-]")
-        exit()
-    except socket.error:
-        print("[-] Erro durante o socket [-]")
-    return
+def list_tasks(tasks):
+    for i, task in enumerate(tasks, start=1):
+        print(f"{i}. {task}")
 
-def main():
-    if len(sys.argv) != 2:
-        print("Uso: python portscanning.py [host]")
-    elif sys.argv[1] == "-h":
-        print("python portscanning.py [host]")
+def remove_task(tasks, task):
+    if task in tasks:
+        tasks.remove(task)
     else:
-        remote_host = sys.argv[1]
-        portScanning(remote_host)
-        
-if __name__ == "__main__":
-    main()
+        print("Task not found")
+
+tasks = []
+while True:
+    print("\n1. Add task")
+    print("2. List tasks")
+    print("3. Remove task")
+    print("4. Exit")
+    choice = input("Choose an option (1-4): ")
+    
+    if choice == '1':
+        task = input("Enter task to add: ")
+        add_task(tasks, task)
+    elif choice == '2':
+        list_tasks(tasks)
+    elif choice == '3':
+        task = input("Enter task to remove: ")
+        remove_task(tasks, task)
+    elif choice == '4':
+        break
+    else:
+        print("Invalid option, please choose again.")
